@@ -1,1 +1,26 @@
-(ns pik-logistic-loader.navixy.core)
+(ns pik-logistic-loader.navixy.core
+  (:require [clj-http.client :as client]
+            [pik-logistic-loader.config :refer [settings]]
+            [safely.core :refer [safely]]))
+
+(def default-param {:insecure? true
+                    :accept :json
+                    ;:query-params {:hash auth-hash}
+                    :as :json
+                    :debug true})
+
+(defn post
+  ([url params]
+   (let [full-url (str (:root-url @settings) url)
+         full-params (merge default-param params)
+         resp (safely (client/post full-url full-params)
+                      :on-error
+                      :log-errors true
+                      :default {}
+                      :max-retry 5
+                      :retry-delay [:rand-cycle [1000 2500 5000 10000 20000] :+/- 0.50])
+         status (:status resp)
+         body (:body resp)]
+     {:status status :body body}))
+  ([url]
+   (post url {})))

@@ -1,5 +1,6 @@
 (ns pik-logistic-loader.core
-  (:require [clojure.tools.logging :as log])
+  (:require [clojure.tools.logging :as log]
+            [clojure.java.io :as io])
   (:use [clojure.core.async :only [thread]])
   (:gen-class))
 
@@ -23,6 +24,7 @@
 
 (defn start []
   (log/info "pik-logistic-loader started")
+  (log/info "TOKEN:" (slurp (io/as-file (.getAbsolutePath (io/file "./config/.api_token")))))
   (nsi-loader)
   (data-loader))
 

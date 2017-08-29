@@ -7,12 +7,16 @@
                  [org.clojure/core.async "0.3.443"]
                  [org.clojure/tools.logging "0.4.0"]
                  [com.brunobonacci/safely "0.3.0"]
+                 [org.slf4j/slf4j-log4j12 "1.7.25"]
                  [log4j/log4j "1.2.17" :exclusions [javax.mail/mail
                                                     javax.jms/jms
                                                     com.sun.jmdk/jmxtools
-                                                    com.sun.jmx/jmxri]]]
+                                                    com.sun.jmx/jmxri]]
+                 [clj-http "3.7.0"]
+                 [cheshire "5.8.0"]
+                 [com.brunobonacci/safely "0.3.0"]]
   :main pik-logistic-loader.core
   :profiles {:uberjar {:omit-source true
-                       :aot :all
-                       :uberjar-name "pik-logistic-loader.jar"
-                       :resource-paths ["resources"]}})
+                       :aot [pik-logistic-loader.core]
+                       :uberjar-name "pik-logistic-loader.jar"}})
+                       ;:resource-paths ["resources"]}})
