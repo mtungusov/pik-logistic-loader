@@ -30,8 +30,26 @@
         path [:body :list]]
     (get-in (req-with-token url params) path)))
 
+(defn tracker-states [tracker-ids]
+  (let [url "/tracker/get_states"
+        trackers (str "["(clojure.string/join "," tracker-ids)"]")
+        params {:form-params {:list_blocked true
+                              :trackers trackers}}
+        path [:body :states]]
+    (get-in (req-with-token url params) path)))
+
+(defn tracker-events [tracker-id from to]
+  (let [url "/history/tracker/list"
+        trackers (str "["tracker-id"]")
+        params {:form-params {:from from
+                              :to to
+                              :trackers trackers}}
+        path [:body :list]]
+    (get-in (req-with-token url params) path)))
 
 
 ;(trackers)
 ;(groups)
 ;(zones)
+;(tracker-states [144950,161633,207507])
+;(tracker-events 144950 "2017-08-24 00:49:00" "2017-08-24 12:49:00")

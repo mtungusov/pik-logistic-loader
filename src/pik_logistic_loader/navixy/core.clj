@@ -27,7 +27,3 @@
   ([url params token]
    (let [params-with-hash (merge params {:query-params {:hash token}})]
      (post url params-with-hash))))
-
-
-(println root-url)
-(post "/tracker/list" {} "2b020c05639775310b1e1d0811a8a5f1")
