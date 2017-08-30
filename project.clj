@@ -14,9 +14,11 @@
                                                     com.sun.jmx/jmxri]]
                  [clj-http "3.7.0"]
                  [cheshire "5.8.0"]
-                 [com.brunobonacci/safely "0.3.0"]]
+                 [com.brunobonacci/safely "0.3.0"]
+                 [cprop "0.1.11"]]
   :main pik-logistic-loader.core
   :profiles {:uberjar {:omit-source true
-                       :aot [pik-logistic-loader.core]
+                       ;:aot [pik-logistic-loader.core]
+                       :aot :all
                        :uberjar-name "pik-logistic-loader.jar"}})
                        ;:resource-paths ["resources"]}})

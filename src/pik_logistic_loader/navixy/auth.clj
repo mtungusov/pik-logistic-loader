@@ -4,10 +4,10 @@
             [pik-logistic-loader.navixy.core :as navixy])
   (:import [java.io File]))
 
-(def token-filename (str "." File/separator "config" File/separator ".api_token"))
-(def token-filepath (.getAbsolutePath (io/as-file token-filename)))
+(def token-filepath (:token-filepath @settings))
+(def hash-life-in-days 25)
+(def time-diff-in-milisec (* 1000 60 60 24 hash-life-in-days))
 (def token-file (io/as-file token-filepath))
-(def time-diff-in-milisec (* 60 60 24 25 1000))
 
 (defn token-from-file []
   (let [exist? (.exists token-file)
@@ -18,12 +18,12 @@
       (slurp token-file))))
 
 (defn token-to-file [token]
-  (spit token-filename token)
+  (spit token-filepath token)
   token)
 
 (defn token-from-api []
-  (let [user (:user @settings)
-        pass (:pass @settings)
+  (let [user (get-in @settings [:navixy :user])
+        pass (get-in @settings [:navixy :pass])
         resp (navixy/post "/user/auth" {:form-params {:login user
                                                       :password pass}})]
     (get-in resp [:body :hash])))
@@ -33,7 +33,8 @@
     token
     (token-to-file (token-from-api))))
 
-;(get-token)
-;(token-to-file "new token 3")
+;(get-in @settings [:navixy :user])
 ;(token-from-file)
-
+;(token-to-file "new token 3")
+;(token-from-api)
+;(get-token)

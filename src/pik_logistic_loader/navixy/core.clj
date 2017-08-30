@@ -3,24 +3,31 @@
             [pik-logistic-loader.config :refer [settings]]
             [safely.core :refer [safely]]))
 
+(def root-url (get-in @settings [:navixy :root-url]))
 (def default-param {:insecure? true
                     :accept :json
                     ;:query-params {:hash auth-hash}
                     :as :json
                     :debug true})
-
 (defn post
   ([url params]
-   (let [full-url (str (:root-url @settings) url)
+   (let [full-url (str root-url url)
          full-params (merge default-param params)
          resp (safely (client/post full-url full-params)
                       :on-error
                       :log-errors true
                       :default {}
-                      :max-retry 5
+                      :max-retry 1
                       :retry-delay [:rand-cycle [1000 2500 5000 10000 20000] :+/- 0.50])
          status (:status resp)
          body (:body resp)]
      {:status status :body body}))
   ([url]
-   (post url {})))
+   (post url {}))
+  ([url params token]
+   (let [params-with-hash (merge params {:query-params {:hash token}})]
+     (post url params-with-hash))))
+
+
+(println root-url)
+(post "/tracker/list" {} "2b020c05639775310b1e1d0811a8a5f1")
