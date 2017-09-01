@@ -1,11 +1,11 @@
 -- :name tracker! :! :n
 -- :doc add or update tracker
 UPDATE trackers SET
-  label = :label, group_id = :group-id
+  label = :label, group_id = :group_id
 WHERE id = :id
 IF @@rowcount = 0
   BEGIN
-    INSERT INTO trackers VALUES (:id, :label, :group-id)
+    INSERT INTO trackers VALUES (:id, :label, :group_id)
   END
 
 -- :name group! :! :n
@@ -19,12 +19,12 @@ IF @@rowcount = 0
 
 -- :name rule! :! :n
 UPDATE rules SET
-  type = :type, name = :name, zone_id = :zone-id
+  type = :type, name = :name, zone_id = :zone_id
 WHERE id = :id
 IF @@rowcount = 0
   BEGIN
     INSERT INTO rules (id, type, name, zone_id)
-    VALUES (:id, :type, :name, :zone-id)
+    VALUES (:id, :type, :name, :zone_id)
   END
 
 -- :name zone! :! :n
@@ -37,22 +37,22 @@ IF @@rowcount = 0
     VALUES (:id, :label, :address)
   END
 
--- :name tracker_event! :! :n
+-- :name tracker-event! :! :n
 UPDATE tracker_events SET
-  event = :event, time = :time, tracker_id = :tracker-id, rule_id = :rule-id, message = :message, address = :address
+  event = :event, time = :time, tracker_id = :tracker_id, rule_id = :rule_id, message = :message, address = :address
 WHERE id = :id
 IF @@rowcount = 0
   BEGIN
     INSERT INTO tracker_events (id, event, time, tracker_id, rule_id, message, address)
-    VALUES (:id, :event, :time, :tracker-id, :rule-id, :message, :address)
+    VALUES (:id, :event, :time, :tracker_id, :rule_id, :message, :address)
   END
 
--- :name tracker_state! :! :n
+-- :name tracker-state! :! :n
 UPDATE tracker_states SET
-  last_update = :last-update, movement_status = :movement-status, connection_status = :connection_status
+  last_update = :last_update, movement_status = :movement_status, connection_status = :connection_status
 WHERE tracker_id = :tracker_id
 IF @@rowcount = 0
   BEGIN
     INSERT INTO tracker_states (tracker_id, last_update, movement_status, connection_status)
-    VALUES (:tracker_id, :last-update, :movement-status, :connection_status)
+    VALUES (:tracker_id, :last_update, :movement_status, :connection_status)
   END

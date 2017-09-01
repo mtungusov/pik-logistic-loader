@@ -50,6 +50,8 @@
 
 ;(trackers)
 ;(groups)
+;(rules)
 ;(zones)
-;(tracker-states [144950,161633,207507])
 ;(tracker-events 144950 "2017-08-24 00:49:00" "2017-08-24 12:49:00")
+;(def ts (tracker-states [144950,161633,207507]))
+;((first (keys ts)) ts)

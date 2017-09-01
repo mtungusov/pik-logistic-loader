@@ -1,6 +1,7 @@
 (ns pik-logistic-loader.core
   (:require [clojure.tools.logging :as log]
-            [clojure.java.io :as io])
+            [clojure.java.io :as io]
+            [pik-logistic-loader.loader.nsi :as nsi])
   (:use [clojure.core.async :only [thread]]
         [pik-logistic-loader.config :only [update-settings]])
   (:gen-class))
@@ -18,6 +19,8 @@
   (log/info "Stopped!"))
 
 (defn nsi-loader []
+  (log/info "NSI loading...")
+  (nsi/load-all)
   (log/info "NSI loaded"))
 
 (defn data-loader []
