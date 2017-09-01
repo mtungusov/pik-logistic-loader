@@ -1,7 +1,8 @@
 (ns pik-logistic-loader.db.core
-  (:require [pik-logistic-loader.config :refer [settings]]))
+  (:require [pik-logistic-loader.config :refer [settings update-settings]]))
             ;[pik-logistic-loader.db.commands :as c]))
 
+(update-settings)
 (def db {:subprotocol (get-in @settings [:sql :subprotocol])
          :subname (get-in @settings [:sql :subname])
          :user (get-in @settings [:sql :user])

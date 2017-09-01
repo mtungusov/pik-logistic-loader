@@ -1,9 +1,11 @@
 (ns pik-logistic-loader.core
   (:require [clojure.tools.logging :as log]
             [clojure.java.io :as io]
+            [clojure.core.async :refer [thread]]
+            [pik-logistic-loader.config :refer [settings update-settings]]
             [pik-logistic-loader.loader.nsi :as nsi])
-  (:use [clojure.core.async :only [thread]]
-        [pik-logistic-loader.config :only [update-settings]])
+  ;(:use [clojure.core.async :only [thread]]
+  ;      [pik-logistic-loader.config :only [update-settings]])
   (:gen-class))
 
 (def state (atom {}))
@@ -19,19 +21,17 @@
   (log/info "Stopped!"))
 
 (defn nsi-loader []
-  (log/info "NSI loading...")
-  (nsi/load-all)
-  (log/info "NSI loaded"))
+  (log/info "Update NSI")
+  (nsi/load-all))
 
 (defn data-loader []
+  (log/info "Update DATA")
   (log/info "Data loaded"))
 
 (defn start []
-  (log/info "Started")
+  (log/info "Starting...")
   (update-settings)
-  (log/info "Update NSI")
   (nsi-loader)
-  (log/info "Update DATA")
   (data-loader))
 
 (defn run-in-thread [period f]

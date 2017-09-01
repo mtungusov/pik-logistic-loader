@@ -1,14 +1,16 @@
 (ns pik-logistic-loader.navixy.core
   (:require [clj-http.client :as client]
-            [pik-logistic-loader.config :refer [settings]]
+            [pik-logistic-loader.config :refer [settings update-settings]]
             [safely.core :refer [safely]]))
 
+(update-settings)
 (def root-url (get-in @settings [:navixy :root-url]))
 (def default-param {:insecure? true
                     :accept :json
                     ;:query-params {:hash auth-hash}
                     :as :json
-                    :debug true})
+                    :debug false})
+
 (defn post
   ([url params]
    (let [full-url (str root-url url)

@@ -1,9 +1,10 @@
 (ns pik-logistic-loader.navixy.auth
   (:require [clojure.java.io :as io]
-            [pik-logistic-loader.config :refer [settings]]
+            [pik-logistic-loader.config :refer [settings update-settings]]
             [pik-logistic-loader.navixy.core :as navixy])
   (:import [java.io File]))
 
+(update-settings)
 (def token-filepath (:token-filepath @settings))
 (def hash-life-in-days 25)
 (def time-diff-in-milisec (* 1000 60 60 24 hash-life-in-days))
