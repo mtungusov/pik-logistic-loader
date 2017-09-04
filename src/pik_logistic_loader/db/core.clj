@@ -1,6 +1,7 @@
 (ns pik-logistic-loader.db.core
   (:require [mount.core :refer [defstate]]
-            [pik-logistic-loader.config :refer [settings]]))
+            [pik-logistic-loader.config :refer [settings]]
+            [pik-logistic-loader.db.queries :as q]))
             ;[pik-logistic-loader.db.commands :as c]))
 
 (defstate db :start {:subprotocol (get-in settings [:sql :subprotocol])
@@ -34,3 +35,5 @@
 ;(name :207507)
 ;(merge p {:tracker_id (read-string (name :207507))})
 ;(c/tracker-state! db (merge p {:tracker_id (name  :207509)}))
+;(map :id (q/tracker-ids db))
+;(q/tracker-ids db)
