@@ -1,20 +1,19 @@
 (ns pik-logistic-loader.db.core
-  (:require [pik-logistic-loader.config :refer [settings update-settings]]))
+  (:require [mount.core :refer [defstate]]
+            [pik-logistic-loader.config :refer [settings]]))
             ;[pik-logistic-loader.db.commands :as c]))
 
-(update-settings)
-(def db {:subprotocol (get-in @settings [:sql :subprotocol])
-         :subname (get-in @settings [:sql :subname])
-         :user (get-in @settings [:sql :user])
-         :password (get-in @settings [:sql :password])
-         :domain (get-in @settings [:sql :domain])})
+(defstate db :start {:subprotocol (get-in settings [:sql :subprotocol])
+                     :subname (get-in settings [:sql :subname])
+                     :user (get-in settings [:sql :user])
+                     :password (get-in settings [:sql :password])
+                     :domain (get-in settings [:sql :domain])})
 
 ;(c/trackers db)
 ;(c/tracker! db {:id 2 :label "test tracker 2" :group_id 0})
 ;(c/rule! db {:id 1 :type "type 11" :name "test name" :zone_id 0})
 ;(c/zone! db {:id 1 :label "test zone", :address "address!"})
 ;(c/tracker-state! db {:tracker_id 1 :last_update "2017-08-31 12:20:30" :movement_status "M" :connection_status "C"})
-
 ;(def p {:connection_status "offline",
 ;        :gps {:updated "2017-09-01 13:26:57",
 ;              :signal_level 100,

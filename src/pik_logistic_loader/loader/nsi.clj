@@ -22,11 +22,11 @@
       (doseq [v values]
         (c/rule! tx v)))))
 
-(defn zones [])
-(let [values (api/zones)]
-  (with-db-transaction [tx db]
-    (doseq [v values]
-      (c/zone! tx v))))
+(defn zones []
+  (let [values (api/zones)]
+    (with-db-transaction [tx db]
+      (doseq [v values]
+        (c/zone! tx v)))))
 
 (defn load-all []
   (trackers)
