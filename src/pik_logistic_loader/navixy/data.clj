@@ -47,7 +47,7 @@
         path [:body :list]]
     (get-in (req-with-token url params) path)))
 
-
+;(get-token)
 ;(trackers)
 ;(groups)
 ;(rules)

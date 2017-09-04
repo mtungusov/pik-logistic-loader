@@ -22,7 +22,7 @@
                  [net.sourceforge.jtds/jtds "1.3.1"]]
   :main pik-logistic-loader.core
   :profiles {:uberjar {:omit-source true
-                       :aot [pik-logistic-loader.core]
-                       ;:aot :all
+                       ;:aot [pik-logistic-loader.core]
+                       :aot :all
                        :uberjar-name "pik-logistic-loader.jar"}})
                        ;:resource-paths ["resources"]}})

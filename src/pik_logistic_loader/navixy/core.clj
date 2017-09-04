@@ -3,7 +3,9 @@
             [pik-logistic-loader.config :refer [settings]]
             [safely.core :refer [safely]]))
 
-(def root-url (get-in settings [:navixy :root-url]))
+(defn root-url []
+  (get-in settings [:navixy :root-url]))
+
 (def default-param {:insecure? true
                     :accept :json
                     ;:query-params {:hash auth-hash}
@@ -12,7 +14,7 @@
 
 (defn post
   ([url params]
-   (let [full-url (str root-url url)
+   (let [full-url (str (root-url) url)
          full-params (merge default-param params)
          resp (safely (client/post full-url full-params)
                       :on-error

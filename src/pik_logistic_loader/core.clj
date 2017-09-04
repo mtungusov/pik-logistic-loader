@@ -4,10 +4,9 @@
             [clojure.core.async :refer [thread]]
             [mount.core :as mount]
             [pik-logistic-loader.config :refer [settings]]
-            [pik-logistic-loader.db.core :refer [db]])
-            ;[pik-logistic-loader.loader.nsi :as nsi])
+            [pik-logistic-loader.db.core :refer [db]]
+            [pik-logistic-loader.loader.nsi :as nsi])
   ;(:use [clojure.core.async :only [thread]]
-  ;      [pik-logistic-loader.config :only [update-settings]])
   (:gen-class))
 
 (def state (atom {}))
@@ -25,8 +24,8 @@
   (log/info "Stopped!"))
 
 (defn nsi-loader []
-  (log/info "Update NSI"))
-  ;(nsi/load-all))
+  (log/info "Update NSI")
+  (nsi/load-all))
 
 (defn data-loader []
   (log/info "Update DATA")
