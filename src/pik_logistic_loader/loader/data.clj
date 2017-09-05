@@ -13,6 +13,12 @@
               :let [d (merge v {:tracker_id (name id)})]]
         (c/tracker-state! tx d)))))
 
+(defn tracker-events [id from])
+
+
+
+
+
 ;(def ids (q/tracker-ids db))
 ;(count ids)
 ;(def st (api/tracker-states ids))

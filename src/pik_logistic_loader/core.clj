@@ -1,5 +1,6 @@
 (ns pik-logistic-loader.core
   (:require [clojure.tools.logging :as log]
+            [clojure.tools.cli :refer [parse-opts]]
             [clojure.java.io :as io]
             [clojure.core.async :refer [thread]]
             [mount.core :as mount]
@@ -11,10 +12,15 @@
 
 (def state (atom {}))
 
+(def cli-options
+  [["-f" "--from Date" "From Date: yyyy-MM-dd HH:mm:ss"
+    :id :from-date]])
+
 (defn init [args]
   (swap! state assoc :running true)
   (mount/start #'settings
-               #'db))
+               #'db
+               (mount/with-args (parse-opts args cli-options))))
 
 (defn stop []
   (swap! state assoc :running false)
@@ -27,14 +33,19 @@
   (log/info "Update NSI")
   (nsi/load-all))
 
-(defn data-loader []
+(defn data-loader [from-date]
   (log/info "Update DATA")
-  (log/info "Data loaded"))
+  (log/info (str "Data loaded from:" from-date)))
 
 (defn start []
-  (log/info "Starting...")
-  (nsi-loader)
-  (data-loader))
+  (if-let [from-date (get-in (mount/args) [:options :from-date])]
+    (do
+      (log/info "Starting...")
+      (nsi-loader)
+      (data-loader from-date))
+    (do
+      (log/error "Need --from option")
+      (System/exit 1))))
 
 (defn run-in-thread [period f]
   (thread
