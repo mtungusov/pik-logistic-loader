@@ -37,16 +37,6 @@ IF @@rowcount = 0
     VALUES (:id, :label, :address)
   END
 
--- :name tracker-event! :! :n
-UPDATE tracker_events SET
-  event = :event, time = :time, tracker_id = :tracker_id, rule_id = :rule_id, message = :message, address = :address
-WHERE id = :id
-IF @@rowcount = 0
-  BEGIN
-    INSERT INTO tracker_events (id, event, time, tracker_id, rule_id, message, address)
-    VALUES (:id, :event, :time, :tracker_id, :rule_id, :message, :address)
-  END
-
 -- :name tracker-state! :! :n
 UPDATE tracker_states SET
   last_update = :last_update, movement_status = :movement_status, connection_status = :connection_status
@@ -55,4 +45,18 @@ IF @@rowcount = 0
   BEGIN
     INSERT INTO tracker_states (tracker_id, last_update, movement_status, connection_status)
     VALUES (:tracker_id, :last_update, :movement_status, :connection_status)
+  END
+
+-- :name remove-events! :! :n
+DELETE FROM tracker_events
+WHERE time >= :time
+
+-- :name tracker-event! :! :n
+UPDATE tracker_events SET
+  event = :event, time = :time, tracker_id = :tracker_id, rule_id = :rule_id, message = :message, address = :address
+WHERE id = :id
+IF @@rowcount = 0
+  BEGIN
+    INSERT INTO tracker_events (id, event, time, tracker_id, rule_id, message, address)
+    VALUES (:id, :event, :time, :tracker_id, :rule_id, :message, :address)
   END

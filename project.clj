@@ -20,7 +20,7 @@
                  [com.layerware/hugsql "0.4.7"]
                  [org.clojure/java.jdbc "0.7.0"]
                  [net.sourceforge.jtds/jtds "1.3.1"]
-                 ;[clj-time "0.14.0"]
+                 [clj-time "0.14.0"]
                  [org.clojure/tools.cli "0.3.5"]]
   :main pik-logistic-loader.core
   :profiles {:uberjar {:omit-source true

@@ -1,8 +1,8 @@
 (ns pik-logistic-loader.db.core
   (:require [mount.core :refer [defstate]]
             [pik-logistic-loader.config :refer [settings]]
-            [pik-logistic-loader.db.queries :as q]))
-            ;[pik-logistic-loader.db.commands :as c]))
+            [pik-logistic-loader.db.queries :as q]
+            [pik-logistic-loader.db.commands :as c]))
 
 (defstate db :start {:subprotocol (get-in settings [:sql :subprotocol])
                             :subname (get-in settings [:sql :subname])
@@ -37,3 +37,6 @@
 ;(c/tracker-state! db (merge p {:tracker_id (name  :207509)}))
 ;(map :id (q/tracker-ids db))
 ;(q/tracker-ids db)
+;(c/tracker-event! db {:id 2, :event "test-event", :time "2017-09-01 10:01:00", :tracker_id 10, :rule_id 99, :message "test event 2", :address "Moscow"})
+;(c/remove-events! db {:time "2017-01-01 00:00:00"})
+;(:time (q/last-tracker-event db {:tracker_id 1}))
