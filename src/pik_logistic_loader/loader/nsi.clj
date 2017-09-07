@@ -1,5 +1,6 @@
 (ns pik-logistic-loader.loader.nsi
   (:require [clojure.java.jdbc :refer [with-db-transaction]]
+            [clojure.tools.logging :as log]
             [pik-logistic-loader.db.core :refer [db]]
             [pik-logistic-loader.db.commands :as c]
             [pik-logistic-loader.navixy.data :as api]))
@@ -8,27 +9,31 @@
   (let [values (api/trackers)]
     (with-db-transaction [tx db]
       (doseq [v values]
-        (c/tracker! tx v)))))
+        (c/tracker! tx v)))
+    (log/info "nsi trackers")))
 
 (defn groups []
   (let [values (api/groups)]
     (with-db-transaction [tx db]
       (doseq [v values]
-        (c/group! tx v)))))
+        (c/group! tx v)))
+    (log/info "nsi groups")))
 
 (defn rules []
   (let [values (api/rules)]
     (with-db-transaction [tx db]
       (doseq [v values]
-        (c/rule! tx v)))))
+        (c/rule! tx v)))
+    (log/info "nsi rules")))
 
 (defn zones []
   (let [values (api/zones)]
     (with-db-transaction [tx db]
       (doseq [v values]
-        (c/zone! tx v)))))
+        (c/zone! tx v)))
+    (log/info "nsi zones")))
 
-(defn load-all []
+(defn process-all []
   (trackers)
   (groups)
   (rules)
@@ -38,3 +43,4 @@
 ;(groups)
 ;(rules)
 ;(zones)
+;(process-all)

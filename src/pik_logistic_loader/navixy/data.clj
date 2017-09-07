@@ -2,7 +2,9 @@
   (:require [pik-logistic-loader.navixy.core :refer [post]]
             [pik-logistic-loader.navixy.auth :refer [get-token]]
             [clj-time.core :as t]
-            [clj-time.format :as tf]))
+            [clj-time.format :as tf]
+            [clj-time.local :as tl]
+            [clojure.tools.logging :as log]))
 
 (def max-history-limit 1000)
 (def max-report-time-span 120)
@@ -45,6 +47,7 @@
     (get-in (req-with-token url params) path)))
 
 (defn tracker-events [tracker-id from to]
+  (log/info (str "POST " tracker-id " from: " from " to: " to))
   (let [url "/history/tracker/list"
         trackers (str "["tracker-id"]")
         params {:form-params {:from from
@@ -60,6 +63,7 @@
 ;if (+ from 120_days) < to then to = (+ from 120_days)
 ;if (size result) == 1000 then from = (:time (last result))
 
+; Получает все события если (to - from) <= 120 days
 (defn- tracker-events-all
   ([tracker-id from to] (tracker-events-all tracker-id from to []))
   ([tracker-id from to acc] (let [events (tracker-events tracker-id from to)]
@@ -69,6 +73,15 @@
                                       from-new (tf/unparse navyixy-time-formatter from-new-time)]
                                   (tracker-events-all tracker-id from-new to (into acc events)))))))
 
+;(defn get-new-from-time [event]
+;  (if-let [time (:time event)]
+;    (tl/format-local-time (t/plus (tf/parse navyixy-time-formatter time) (t/seconds 1)) :mysql)
+;    (tl/format-local-time (t/minus (tl/local-now) (t/days max-report-time-span)) :mysql)))
+
+(defn get-new-from-time [time]
+  (tl/format-local-time (t/plus (tf/parse navyixy-time-formatter time) (t/seconds 1)) :mysql))
+
+; Получает все событие даже если (to - from) > 120 days
 (defn tracker-events-all-time
   ([tracker-id from to acc] (let [from-time (tf/parse navyixy-time-formatter from)
                                   to-time (tf/parse navyixy-time-formatter to)
@@ -76,11 +89,17 @@
                               (if (> from-to-in-days max-report-time-span)
                                 (let [to-new (tf/unparse navyixy-time-formatter (t/plus from-time (t/days 120)))
                                       events (tracker-events-all tracker-id from to-new acc)
-                                      from-new-time (t/plus (tf/parse navyixy-time-formatter (:time (last events))) (t/seconds 1))
-                                      from-new (tf/unparse navyixy-time-formatter from-new-time)]
+                                      from-new (get-new-from-time to-new)]
                                   (tracker-events-all-time tracker-id from-new to events))
                                 (into acc (tracker-events-all tracker-id from to)))))
   ([tracker-id from to] (tracker-events-all-time tracker-id from to [])))
+
+
+;(tracker-events-all-time 144942 "2017-01-01 00:00:00" "2017-09-07 10:49:00")
+;(tracker-events-all-time 202802 "2017-01-01 00:00:00" "2017-09-07 10:49:00")
+
+;(get-new-from-time {:time "2017-09-01 10:00:00"})
+;(get-new-from-time {})
 
 ;(get-token)
 ;(trackers)

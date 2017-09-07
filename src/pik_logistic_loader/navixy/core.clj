@@ -18,10 +18,10 @@
          full-params (merge default-param params)
          resp (safely (client/post full-url full-params)
                       :on-error
-                      :log-errors true
+                      :log-errors false
                       :default {}
-                      :max-retry 1
-                      :retry-delay [:rand-cycle [1000 2500 5000 10000 20000] :+/- 0.50])
+                      :max-retry 7
+                      :retry-delay [:rand-cycle [1000 2500 5000 10000 20000 40000 80000 160000] :+/- 0.50])
          status (:status resp)
          body (:body resp)]
      {:status status :body body}))
