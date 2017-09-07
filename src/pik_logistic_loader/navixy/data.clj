@@ -71,7 +71,7 @@
                                 (into acc events)
                                 (let [from-new-time (t/plus (tf/parse navyixy-time-formatter (:time (last events))) (t/seconds 1))
                                       from-new (tf/unparse navyixy-time-formatter from-new-time)]
-                                  (tracker-events-all tracker-id from-new to (into acc events)))))))
+                                  (recur tracker-id from-new to (into acc events)))))))
 
 ;(defn get-new-from-time [event]
 ;  (if-let [time (:time event)]
@@ -90,11 +90,12 @@
                                 (let [to-new (tf/unparse navyixy-time-formatter (t/plus from-time (t/days 120)))
                                       events (tracker-events-all tracker-id from to-new acc)
                                       from-new (get-new-from-time to-new)]
-                                  (tracker-events-all-time tracker-id from-new to events))
+                                  (recur tracker-id from-new to events))
                                 (into acc (tracker-events-all tracker-id from to)))))
   ([tracker-id from to] (tracker-events-all-time tracker-id from to [])))
 
 
+;(tracker-events-all 144950 "2017-01-01 00:49:00" "2017-05-01 00:49:00")
 ;(tracker-events-all-time 144942 "2017-01-01 00:00:00" "2017-09-07 10:49:00")
 ;(tracker-events-all-time 202802 "2017-01-01 00:00:00" "2017-09-07 10:49:00")
 
