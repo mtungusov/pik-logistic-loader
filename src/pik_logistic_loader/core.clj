@@ -30,16 +30,17 @@
   (log/info "Stopped!"))
 
 (defn nsi-loader []
-  (log/info "Update NSI")
+  (log/info "Updating NSI")
   (nsi/process-all))
 
 (defn data-loader
   ([from-date] (do
-                 (log/info "Update DATA")
-                 (log/info (str "Data loaded from:" from-date))
-                 (data/process-all from-date)))
+                 (log/info "Updating DATA")
+                 (log/info (str "Data loading from: " from-date))
+                 (data/process-all from-date)
+                 (log/info "Data loaded")))
   ([] (do
-        (log/info "Update DATA")
+        (log/info "Updating DATA")
         (data/process-all))))
 
 (defn start []
