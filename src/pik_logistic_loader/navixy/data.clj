@@ -108,6 +108,7 @@
 ;(rules)
 ;(zones)
 ;(def ts (tracker-states [144950,161633,207507]))
+;(tracker-states [163164])
 ;((first (keys ts)) ts)
 ;(def my-tr (tracker-events 144950 "2017-08-01 00:49:00" "2017-08-24 12:49:00"))
 ;(def my-tr (tracker-events 144950 "2017-01-01 00:49:00" "2017-05-01 00:49:00"))

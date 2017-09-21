@@ -1,11 +1,16 @@
+-- :name disable-trackers! :! :n
+-- :doc disable all trackers
+UPDATE trackers SET
+  live = 0
+
 -- :name tracker! :! :n
 -- :doc add or update tracker
 UPDATE trackers SET
-  label = :label, group_id = :group_id
+  label = :label, group_id = :group_id, live = 1
 WHERE id = :id
 IF @@rowcount = 0
   BEGIN
-    INSERT INTO trackers VALUES (:id, :label, :group_id)
+    INSERT INTO trackers VALUES (:id, :label, :group_id, 1)
   END
 
 -- :name group! :! :n

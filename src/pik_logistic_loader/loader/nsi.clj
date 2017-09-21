@@ -8,6 +8,7 @@
 (defn trackers []
   (let [values (api/trackers)]
     (with-db-transaction [tx db]
+      (c/disable-trackers! tx)
       (doseq [v values]
         (c/tracker! tx v)))
     (log/info "nsi trackers")))
@@ -38,6 +39,7 @@
   (groups)
   (rules)
   (zones))
+
 
 ;(trackers)
 ;(groups)

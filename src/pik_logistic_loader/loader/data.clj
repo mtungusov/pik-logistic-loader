@@ -41,6 +41,7 @@
                          (doseq [[id, v] values
                                  :let [d (merge v {:tracker_id (name id)})]]
                            (c/tracker-state! tx d)))
+                           ;(log/info d)))
     (log/info "trackers states loaded")))
 
 (defn process-all
@@ -57,6 +58,7 @@
 ;(def ids (q/tracker-ids db))
 ;(count ids)
 ;(def st (api/tracker-states ids))
+;(str "["(clojure.string/join "," ids)"]")
 ;(count st)
 ;(doseq [[id, val] st
 ;        :let [d (merge val {:tracker_id (name id)})]]
