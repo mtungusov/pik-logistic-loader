@@ -32,6 +32,9 @@
     token
     (token-to-file (:token-filepath settings) (token-from-api))))
 
+(defn renew-token []
+  (token-to-file (:token-filepath settings) (token-from-api)))
+
 ;(get-in settings [:navixy :user])
 ;(token-from-file)
 ;(token-to-file "new token 3")

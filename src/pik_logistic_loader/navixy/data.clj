@@ -1,6 +1,6 @@
 (ns pik-logistic-loader.navixy.data
   (:require [pik-logistic-loader.navixy.core :refer [post]]
-            [pik-logistic-loader.navixy.auth :refer [get-token]]
+            [pik-logistic-loader.navixy.auth :refer [get-token renew-token]]
             [clj-time.core :as t]
             [clj-time.format :as tf]
             [clj-time.local :as tl]
@@ -11,8 +11,18 @@
 (def navyixy-time-formatter (tf/formatter "yyyy-MM-dd HH:mm:ss"))
 
 (defn req-with-token [url params]
-  (let [token (get-token)]
-    (post url params token)))
+  (let [token (get-token)
+        resp (post url params token)]
+    (case (:status resp)
+      400 (case (get-in resp [:body :status-code])
+            (or 3 4) (post url params (renew-token))
+            217 {:status-code 217 :body {:list []}}
+            resp)
+      resp)))
+
+;(def token (get-token))
+;(def resp (post url params token))
+;(println token)
 
 (defn trackers []
   (let [url "/tracker/list"
@@ -56,6 +66,14 @@
         path [:body :list]]
     (get-in (req-with-token url params) path)))
 
+
+;(def url "/history/tracker/list")
+;(def params {:form-params {:from "2017-09-18 11:59:59"
+;                           :to "2017-09-18 12:40:30"
+;                           :trackers "[229289]"}})
+;
+;(req-with-token url params)
+
 ;Выход при условиях:
 ;(size result) < 1000 and (to - from) <= 120_days
 
@@ -98,6 +116,8 @@
 ;(tracker-events-all 144950 "2017-01-01 00:49:00" "2017-05-01 00:49:00")
 ;(tracker-events-all-time 144942 "2017-01-01 00:00:00" "2017-09-07 10:49:00")
 ;(tracker-events-all-time 202802 "2017-01-01 00:00:00" "2017-09-07 10:49:00")
+;(tracker-events-all-time 144950 "2017-09-18 11:59:59" "2017-09-18 12:40:30")
+;(tracker-events-all-time 229289 "2017-09-18 11:59:59" "2017-09-18 12:59:59")
 
 ;(get-new-from-time {:time "2017-09-01 10:00:00"})
 ;(get-new-from-time {})
