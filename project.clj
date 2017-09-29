@@ -8,7 +8,6 @@
                  [mount "0.1.11"]
                  [org.clojure/core.async "0.3.443"]
                  [org.clojure/tools.logging "0.4.0"]
-                 [com.brunobonacci/safely "0.3.0"]
                  [org.slf4j/slf4j-log4j12 "1.7.25"]
                  [log4j/log4j "1.2.17" :exclusions [javax.mail/mail
                                                     javax.jms/jms
