@@ -55,17 +55,25 @@
       (nsi-loader)
       (data-loader))))
 
-(defn run-in-thread [period f]
+(defn- run-in-thread [period f stop-fun]
   (thread
     (while (:running @state)
       (Thread/sleep period)
-      (f))))
+      (let [r (try
+                (f)
+                :ok
+                (catch Exception e
+                  (log/error (.getMessage e))
+                  :error))]
+        (when (= r :error)
+          (stop-fun))))))
+
 
 (defn -main [& args]
   (init args)
   (start)
   (.addShutdownHook (Runtime/getRuntime)
                     (Thread. stop))
-  (run-in-thread (* 5 60 1000) nsi-loader)
-  (run-in-thread (* 1 60 1000) data-loader)
+  (run-in-thread (* 5 60 1000) nsi-loader stop)
+  (run-in-thread (* 1 60 1000) data-loader stop)
   (while (:running @state) (Thread/sleep 1000)))

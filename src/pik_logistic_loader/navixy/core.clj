@@ -1,6 +1,6 @@
 (ns pik-logistic-loader.navixy.core
   (:require [clj-http.client :as client]
-            [slingshot.slingshot :refer [try+]]
+            [slingshot.slingshot :refer [try+ throw+]]
             [pik-logistic-loader.config :refer [settings]]
             [safely.core :refer [safely]]
             [clojure.tools.logging :as log]
@@ -21,19 +21,27 @@
     (catch [:status 400] {:keys [status body]}
       (let [body-from-json (parse-string body true)
             status-code (get-in body-from-json [:status :code])]
-        {:status status :body {:status-code status-code}}))))
+        {:status status :body {:status-code status-code}}))
+    (catch [:status 404] _
+      (throw+ "my-404-error"))
+    (catch [:status 500] _
+      (throw+ "my-500-error"))
+    (catch [:status 502] _
+      (throw+ "my-502-error"))
+    (catch [:status 503] _
+      (throw+ "my-503-error"))))
 
 (defn post
   ([url params]
    (let [full-url (str (root-url) url)
          full-params (merge default-param params)
-         ;resp (safely (client/post full-url full-params))
          resp (safely (post-try full-url full-params)
                       :on-error
                       :log-errors true
                       :default {}
                       :max-retry 7
-                      :retry-delay [:rand-cycle [1000 2500 5000 10000 20000 40000 80000 160000] :+/- 0.50])
+                      :retry-delay [:rand-cycle [1000 2500 5000 10000 20000 40000 80000 160000] :+/- 0.50]
+                      :retryable-error? #(not (#{"my-404-error"} (:object (ex-data %)))))
          status (:status resp)
          body (:body resp)]
      {:status status :body body}))
@@ -43,18 +51,25 @@
    (let [params-with-hash (merge params {:query-params {:hash token}})]
      (post url params-with-hash))))
 
+;(root-url)
 ;(def url "/history/tracker/list")
 ;(def full-url (str (root-url) url))
+;(def full-url (str "https://1api.navixy.com/v2" url))
 ;(def params {:form-params {:from "2017-09-18 11:59:59"
 ;                           :to "2017-09-25 11:59:59"
 ;                           :trackers [144942]}})
 ;(def full-params (merge default-param params))
 ;
-;(post-try full-url full-params)
-;(post url params)
+;(def r (post-try full-url full-params))
+;(ex-data (post-try full-url full-params))
 
+;(try (post-try full-url full-params)
+;     (catch Exception e
+;       (ex-data e)))
+;(post url params)
 ;;(println full-params)
 ;
+;(post url params)
 ;(let [resp (client/post full-url (merge full-params {:throw-exceptions false}))
 ;      status (:status resp)
 ;      body (:body resp)]
