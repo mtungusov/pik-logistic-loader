@@ -31,6 +31,14 @@
     (catch [:status 503] _
       (throw+ "my-503-error"))))
 
+(defn- get-err-info [e]
+  (if-let [i (ex-data e)]
+    (:object i)
+    (str (type e))))
+
+;(try (/ 1 0)
+;  (catch Exception e(get-err-info e)))
+
 (defn post
   ([url params]
    (let [full-url (str (root-url) url)
@@ -41,7 +49,7 @@
                       :default {}
                       :max-retry 7
                       :retry-delay [:rand-cycle [1000 2500 5000 10000 20000 40000 80000 160000] :+/- 0.50]
-                      :retryable-error? #(not (#{"my-404-error"} (:object (ex-data %)))))
+                      :retryable-error? #(not (#{"my-404-error" "class java.net.UnknownHostException"} (get-err-info %))))
          status (:status resp)
          body (:body resp)]
      {:status status :body body}))
