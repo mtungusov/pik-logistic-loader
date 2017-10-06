@@ -45,11 +45,11 @@
          full-params (merge default-param params)
          resp (safely (post-try full-url full-params)
                       :on-error
-                      :log-errors true
+                      :log-errors false
                       :default {}
                       :max-retry 7
                       :retry-delay [:rand-cycle [1000 2500 5000 10000 20000 40000 80000 160000] :+/- 0.50]
-                      :retryable-error? #(not (#{"my-404-error" "class java.net.UnknownHostException"} (get-err-info %))))
+                      :retryable-error? #(not (#{"my-404-error" "class java.net.UnknownHostException" "class java.net.ConnectException"} (get-err-info %))))
          status (:status resp)
          body (:body resp)]
      {:status status :body body}))

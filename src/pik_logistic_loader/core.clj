@@ -5,7 +5,7 @@
             [clojure.core.async :refer [thread]]
             [mount.core :as mount]
             [pik-logistic-loader.config :refer [settings]]
-            [pik-logistic-loader.db.core :refer [db]]
+            [pik-logistic-loader.db.core :refer [db-data db-nsi]]
             [pik-logistic-loader.loader.nsi :as nsi]
             [pik-logistic-loader.loader.data :as data])
   (:gen-class))
@@ -19,7 +19,8 @@
 (defn init [args]
   (swap! state assoc :running true)
   (mount/start #'settings
-               #'db
+               #'db-data
+               #'db-nsi
                (mount/with-args (parse-opts args cli-options))))
 
 (defn stop []
@@ -52,8 +53,7 @@
       (System/exit 1))
     (do
       (log/info "Starting in daemon mode")
-      (nsi-loader)
-      (data-loader))))
+      (nsi-loader))))
 
 (defn- run-in-thread [period f stop-fun]
   (thread
@@ -75,5 +75,6 @@
   (.addShutdownHook (Runtime/getRuntime)
                     (Thread. stop))
   (run-in-thread (* 5 60 1000) nsi-loader stop)
-  (run-in-thread (* 1 60 1000) data-loader stop)
-  (while (:running @state) (Thread/sleep 1000)))
+  (while (:running @state)
+    (data-loader)
+    (Thread/sleep (* 1 60 1000))))

@@ -1,7 +1,7 @@
 (ns pik-logistic-loader.loader.data
   (:require [clojure.tools.logging :as log]
             [clojure.java.jdbc :refer [with-db-transaction]]
-            [pik-logistic-loader.db.core :refer [db]]
+            [pik-logistic-loader.db.core :refer [db-data] :rename {db-data db}]
             [pik-logistic-loader.db.commands :as c]
             [pik-logistic-loader.db.queries :as q]
             [pik-logistic-loader.navixy.data :as api]

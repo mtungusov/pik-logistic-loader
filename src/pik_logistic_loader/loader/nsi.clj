@@ -1,7 +1,7 @@
 (ns pik-logistic-loader.loader.nsi
   (:require [clojure.java.jdbc :refer [with-db-transaction]]
             [clojure.tools.logging :as log]
-            [pik-logistic-loader.db.core :refer [db]]
+            [pik-logistic-loader.db.core :refer [db-nsi] :rename {db-nsi db}]
             [pik-logistic-loader.db.commands :as c]
             [pik-logistic-loader.navixy.data :as api]))
 
@@ -40,7 +40,8 @@
   (rules)
   (zones))
 
-
+;(identity db)
+;(api/trackers)
 ;(trackers)
 ;(groups)
 ;(rules)
