@@ -28,7 +28,8 @@
   (log/info "Stopping...")
   (shutdown-agents)
   (Thread/sleep 1000)
-  (log/info "Stopped!"))
+  (log/info "Stopped!")
+  (System/exit 1))
 
 (defn nsi-loader []
   (log/info "Updating NSI")
