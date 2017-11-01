@@ -34,15 +34,31 @@
         (doseq [tracker-id tracker-ids]
           (tracker-events tracker-id)))))
 
+(defn- prepare-tracker-state-for-db [id state]
+  {:tracker_id (name id)
+   :last_update (:last_update state)
+   :gsm_updated (get-in state [:gsm :updated])
+   :gps_updated (get-in state [:gps :updated])
+   :movement_status (:movement_status state)
+   :connection_status (:connection_status state)
+   :gps_lat (get-in state [:gps :location :lat])
+   :gps_lng (get-in state [:gps :location :lng])})
+
+
 (defn tracker-states []
   (let [ids (q/tracker-ids db)
         values (api/tracker-states ids)]
     (with-db-transaction [tx db]
                          (doseq [[id, v] values
-                                 :let [d (merge v {:tracker_id (name id)})]]
+                                 :let [d (prepare-tracker-state-for-db id v)]]
                            (c/tracker-state! tx d)))
                            ;(log/info d)))
     (log/info "trackers states loaded")))
+
+;(def t (api/tracker-states '[197531]))
+;(api/tracker-states '(197531))
+;(let [[i v] (first t)]
+;  (identity (prepare-tracker-state-for-db i v)))
 
 (defn process-all
   ([from] (do
@@ -52,7 +68,11 @@
         (tracker-states)
         (all-tracker-events))))
 
+
 ;(q/tracker-ids db)
+;(def ids (q/tracker-ids db))
+;(count ids)
+;(api/tracker-states ids)
 ;(all-tracker-events "2017-01-01 00:00:00")
 ;(tracker-events 202802 "2017-01-01 00:00:00")
 ;(def ids (q/tracker-ids db))

@@ -44,12 +44,17 @@ IF @@rowcount = 0
 
 -- :name tracker-state! :! :n
 UPDATE tracker_states SET
-  last_update = :last_update, movement_status = :movement_status, connection_status = :connection_status
+  movement_status = :movement_status, last_update = :last_update,
+  connection_status = :connection_status,
+  gsm_updated = :gsm_updated, gps_updated = :gps_updated,
+  gps_lat = :gps_lat, gps_lng = :gps_lng
 WHERE tracker_id = :tracker_id
 IF @@rowcount = 0
   BEGIN
-    INSERT INTO tracker_states (tracker_id, last_update, movement_status, connection_status)
-    VALUES (:tracker_id, :last_update, :movement_status, :connection_status)
+    INSERT INTO tracker_states (tracker_id, last_update, movement_status, connection_status,
+                                gsm_updated, gps_updated, gps_lat, gps_lng)
+    VALUES (:tracker_id, :last_update, :movement_status, :connection_status,
+            :gsm_updated, :gps_updated, :gps_lat, :gps_lng)
   END
 
 -- :name remove-events! :! :n

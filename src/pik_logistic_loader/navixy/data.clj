@@ -56,6 +56,7 @@
         path [:body :states]]
     (get-in (req-with-token url params) path)))
 
+
 (defn tracker-events [tracker-id from to]
   (log/info (str "POST " tracker-id " from: " from " to: " to))
   (let [url "/history/tracker/list"
