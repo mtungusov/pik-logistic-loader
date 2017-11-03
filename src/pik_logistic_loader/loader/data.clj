@@ -45,15 +45,16 @@
    :gps_lng (get-in state [:gps :location :lng])})
 
 
-(defn tracker-states []
-  (let [ids (q/tracker-ids db)
-        values (api/tracker-states ids)]
-    (with-db-transaction [tx db]
-                         (doseq [[id, v] values
-                                 :let [d (prepare-tracker-state-for-db id v)]]
-                           (c/tracker-state! tx d)))
-                           ;(log/info d)))
-    (log/info "trackers states loaded")))
+(defn tracker-states
+  ([ids] (let [values (api/tracker-states ids)]
+           (with-db-transaction [tx db]
+             (doseq [[id, v] values
+                     :let [d (prepare-tracker-state-for-db id v)]]
+               (c/tracker-state! tx d)))
+           ;(log/info d)))
+           (log/info "trackers states loaded")))
+  ([] (let [ids (q/tracker-ids db)]
+        (tracker-states ids))))
 
 ;(def t (api/tracker-states '[197531]))
 ;(api/tracker-states '(197531))
