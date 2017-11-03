@@ -1,10 +1,10 @@
 (ns pik-logistic-loader.navixy.core
   (:require [clj-http.client :as client]
             [slingshot.slingshot :refer [try+ throw+]]
-            [pik-logistic-loader.config :refer [settings]]
             [safely.core :refer [safely]]
             [clojure.tools.logging :as log]
-            [cheshire.core :refer [parse-string]]))
+            [cheshire.core :refer [parse-string]]
+            [pik-logistic-loader.config :refer [settings]]))
 
 (defn root-url []
   (get-in settings [:navixy :root-url]))
@@ -39,6 +39,14 @@
 ;(try (/ 1 0)
 ;  (catch Exception e(get-err-info e)))
 
+(def not-retry-errors-set #{"my-404-error" "class java.net.UnknownHostException" "class java.net.ConnectException"})
+
+(defn retry-post? [e]
+  (let [err-info (get-err-info e)]
+    (not (not-retry-errors-set err-info))))
+
+;(not (not-retry-errors-set "my-503-error"))
+
 (defn post
   ([url params]
    (let [full-url (str (root-url) url)
@@ -48,8 +56,8 @@
                       :log-errors true
                       :default {}
                       :max-retry 7
-                      :retry-delay [:rand-cycle [1000 2500 5000 10000 20000 40000 80000 160000] :+/- 0.50]
-                      :retryable-error? #(not (#{"my-404-error" "class java.net.UnknownHostException" "class java.net.ConnectException"} (get-err-info %))))
+                      :retry-delay [:rand-cycle [1000 3000 9000 15000 30000 60000 120000] :+/- 0.50]
+                      :retryable-error? #(retry-post? %))
          status (:status resp)
          body (:body resp)]
      {:status status :body body}))
@@ -58,6 +66,8 @@
   ([url params token]
    (let [params-with-hash (merge params {:query-params {:hash token}})]
      (post url params-with-hash))))
+
+
 
 ;(root-url)
 ;(def url "/history/tracker/list")

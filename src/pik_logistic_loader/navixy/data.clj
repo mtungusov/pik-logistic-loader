@@ -1,28 +1,27 @@
 (ns pik-logistic-loader.navixy.data
-  (:require [pik-logistic-loader.navixy.core :refer [post]]
-            [pik-logistic-loader.navixy.auth :refer [get-token renew-token]]
-            [clj-time.core :as t]
+  (:require [clj-time.core :as t]
             [clj-time.format :as tf]
             [clj-time.local :as tl]
-            [clojure.tools.logging :as log]))
+            [clojure.tools.logging :as log]
+            [pik-logistic-loader.navixy.auth :refer [req-with-token]]))
 
 (def max-history-limit 1000)
 (def max-report-time-span 120)
 (def navyixy-time-formatter (tf/formatter "yyyy-MM-dd HH:mm:ss"))
 
-(defn req-with-token [url params]
-  (let [token (get-token)
-        resp (post url params token)]
-    (case (:status resp)
-      400 (case (get-in resp [:body :status-code])
-            (or 3 4) (post url params (renew-token))
-            217 {:status-code 217 :body {:list []}}
-            resp)
-      resp)))
-
-;(def token (get-token))
-;(def resp (post url params token))
-;(println token)
+;(defn req-with-token [url params]
+;  (let [token (get-token)
+;        resp (post url params token)]
+;    (case (:status resp)
+;      400 (case (get-in resp [:body :status-code])
+;            (or 3 4) (post url params (renew-token))
+;            217 {:status-code 217 :body {:list []}}
+;            resp)
+;      resp)))
+;
+;;(def token (get-token))
+;;(def resp (post url params token))
+;;(println token)
 
 (defn trackers []
   (let [url "/tracker/list"

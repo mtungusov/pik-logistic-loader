@@ -7,7 +7,7 @@
 (def hash-life-in-days 25)
 (def time-diff-in-milisec (* 1000 60 60 24 hash-life-in-days))
 
-(defn token-from-file []
+(defn- token-from-file []
   (let [token-file (io/as-file (:token-filepath settings))
         exist? (.exists token-file)
         mtime (.lastModified token-file)
@@ -16,23 +16,23 @@
     (when (and exist? fresh?)
       (slurp token-file))))
 
-(defn token-to-file [path token]
+(defn- token-to-file [path token]
   (spit path token)
   token)
 
-(defn token-from-api []
+(defn- token-from-api []
   (let [user (get-in settings [:navixy :user])
         pass (get-in settings [:navixy :pass])
         resp (navixy/post "/user/auth" {:form-params {:login user
                                                       :password pass}})]
     (get-in resp [:body :hash])))
 
-(defn get-token []
+(defn- get-token []
   (if-let [token (token-from-file)]
     token
     (token-to-file (:token-filepath settings) (token-from-api))))
 
-(defn renew-token []
+(defn- renew-token []
   (token-to-file (:token-filepath settings) (token-from-api)))
 
 ;(get-in settings [:navixy :user])
@@ -41,3 +41,13 @@
 ;(token-from-api)
 ;(get-token)
 ;(:token-filepath settings)
+
+(defn req-with-token [url params]
+  (let [token (get-token)
+        resp (navixy/post url params token)]
+    (case (:status resp)
+      400 (case (get-in resp [:body :status-code])
+            (or 3 4) (navixy/post url params (renew-token))
+            217 {:status-code 217 :body {:list []}}
+            resp)
+      resp)))
