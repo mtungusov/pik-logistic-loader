@@ -2,7 +2,7 @@
   (:require [clojure.tools.logging :as log]
             [clojure.tools.cli :refer [parse-opts]]
             [clojure.java.io :as io]
-            [clojure.core.async :refer [thread]]
+            ; [clojure.core.async :refer [thread]]
             [mount.core :as mount]
             [pik-logistic-loader.config :refer [settings]]
             [pik-logistic-loader.db.core :refer [db-data db-nsi]]
@@ -16,26 +16,47 @@
   [["-f" "--from Date" "From Date: yyyy-MM-dd HH:mm:ss"
     :id :from-date]])
 
-(defn init [args]
+
+(defn- init [args]
   (swap! state assoc :running true)
   (mount/start #'settings
                #'db-data
                #'db-nsi
                (mount/with-args (parse-opts args cli-options))))
 
-(defn stop []
-  (swap! state assoc :running false)
-  (log/info "Stopping...")
-  (shutdown-agents)
-  (Thread/sleep 1000)
-  (log/info "Stopped!")
-  (System/exit 1))
 
-(defn nsi-loader []
+(defn- stop-main-loop []
+  (swap! state assoc :running false))
+
+
+(defn- stop []
+  (log/info "Stopping...")
+  (stop-main-loop)
+  ; (shutdown-agents)
+  ;(Thread/sleep 2000)
+  (log/info "Stop!"))
+
+
+(defn- run-in-thread [period f]
+  (.start
+    (Thread.
+      (fn []
+        (try
+          (while (:running @state)
+            (f)
+            (Thread/sleep period))
+          (catch InterruptedException _)
+          (catch Exception e
+            (log/info e)
+            (stop-main-loop)))))))
+
+
+(defn- nsi-loader []
   (log/info "Updating NSI")
   (nsi/process-all))
 
-(defn data-loader
+
+(defn- data-loader
   ([from-date] (do
                  (log/info "Updating DATA")
                  (log/info (str "Data loading from: " from-date))
@@ -45,7 +66,8 @@
         (log/info "Updating DATA")
         (data/process-all))))
 
-(defn start []
+
+(defn- start []
   (if-let [from-date (get-in (mount/args) [:options :from-date])]
     (do
       (log/info "Starting only DATA load with specific time")
@@ -56,26 +78,34 @@
       (log/info "Starting in daemon mode")
       (nsi-loader))))
 
-(defn- run-in-thread [period f stop-fun]
-  (thread
-    (while (:running @state)
-      (Thread/sleep period)
-      (let [r (try
-                (f)
-                :ok
-                (catch Exception e
-                  (log/error (.getMessage e))
-                  :error))]
-        (when (= r :error)
-          (stop-fun))))))
+
+; (defn- run-in-thread [period f stop-fun]
+;   (thread
+;     (while (:running @state)
+;       (Thread/sleep period)
+;       (let [r (try
+;                 (f)
+;                 :ok
+;                 (catch Exception e
+;                   (log/error (.getMessage e))
+;                   :error))]
+;         (when (= r :error)
+;           (stop-fun))))))
 
 
 (defn -main [& args]
   (init args)
-  (start)
   (.addShutdownHook (Runtime/getRuntime)
                     (Thread. stop))
-  (run-in-thread (* 5 60 1000) nsi-loader stop)
-  (while (:running @state)
-    (data-loader)
-    (Thread/sleep (* 1 60 1000))))
+  (start)
+  (run-in-thread (* 1 60 1000) data-loader)
+  (run-in-thread (* 5 60 1000) nsi-loader)
+  
+  (try
+    (while (:running @state)
+      (Thread/sleep 1000))
+    (catch InterruptedException e)))
+
+  ; (while (:running @state)
+  ;   (data-loader)
+  ;   (Thread/sleep (* 1 60 1000))))
