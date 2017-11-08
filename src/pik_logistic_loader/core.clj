@@ -7,7 +7,8 @@
             [pik-logistic-loader.config :refer [settings]]
             [pik-logistic-loader.db.core :refer [db-data db-nsi]]
             [pik-logistic-loader.loader.nsi :as nsi]
-            [pik-logistic-loader.loader.data :as data])
+            [pik-logistic-loader.loader.data :as data]
+            [pik-logistic-loader.loader.history :as history])
   (:gen-class))
 
 (def state (atom {}))
@@ -67,6 +68,9 @@
         (data/process-all))))
 
 
+(defn- history-loader []
+  (history/process))
+
 (defn- start []
   (if-let [from-date (get-in (mount/args) [:options :from-date])]
     (do
@@ -76,7 +80,8 @@
       (System/exit 1))
     (do
       (log/info "Starting in daemon mode")
-      (nsi-loader))))
+      (nsi-loader)
+      (data-loader))))
 
 
 ; (defn- run-in-thread [period f stop-fun]
@@ -98,7 +103,7 @@
   (.addShutdownHook (Runtime/getRuntime)
                     (Thread. stop))
   (start)
-  (run-in-thread (* 1 60 1000) data-loader)
+  (run-in-thread (* 1 60 1000) history-loader)
   (run-in-thread (* 5 60 1000) nsi-loader)
   
   (try
