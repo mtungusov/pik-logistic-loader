@@ -29,6 +29,8 @@
         path [:body :list]]
     (get-in (req-with-token url params) path)))
 
+;(map :id (trackers))
+
 (defn groups []
   (let [url "/tracker/group/list"
         params {}
@@ -47,14 +49,21 @@
         path [:body :list]]
     (get-in (req-with-token url params) path)))
 
+
 (defn tracker-states [tracker-ids]
   (let [url "/tracker/get_states"
-        trackers (str "["(clojure.string/join "," tracker-ids)"]")
+        trackers-str (str "["(clojure.string/join "," tracker-ids)"]")
         params {:form-params {:list_blocked true
-                              :trackers trackers}}
-        path [:body :states]]
-    (get-in (req-with-token url params) path)))
+                              :trackers trackers-str}}
+        path [:body :states]
+        resp (req-with-token url params)]
+    (if (= 217 (:status-code resp))
+      (let [tracker-ids-from-api (map :id (trackers))
+            ids (clojure.set/intersection (set tracker-ids) (set tracker-ids-from-api))]
+        (tracker-states ids))
+      (get-in resp path))))
 
+;(tracker-states [144950 161287 163160 162189 162188])
 
 (defn tracker-events [tracker-id from to]
   (log/info (str "POST " tracker-id " from: " from " to: " to))

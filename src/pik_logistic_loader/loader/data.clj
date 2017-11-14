@@ -50,9 +50,8 @@
            (with-db-transaction [tx db]
              (doseq [[id, v] values
                      :let [d (prepare-tracker-state-for-db id v)]]
-               (c/tracker-state! tx d)))
+               (c/tracker-state! tx d)))))
            ;(log/info d)))
-           (log/info "trackers states loaded")))
   ([] (let [ids (q/tracker-ids db)]
         (tracker-states ids))))
 
@@ -62,12 +61,8 @@
 ;  (identity (prepare-tracker-state-for-db i v)))
 
 (defn process-all
-  ([from] (do
-            (tracker-states)
-            (all-tracker-events from)))
-  ([] (do
-        (tracker-states)
-        (all-tracker-events))))
+  ([from] (all-tracker-events from))
+  ([]     (all-tracker-events)))
 
 
 ;(q/tracker-ids db)

@@ -13,6 +13,7 @@
         (c/tracker! tx v)))
     (log/info "nsi trackers")))
 
+
 (defn groups []
   (let [values (api/groups)]
     (with-db-transaction [tx db]
