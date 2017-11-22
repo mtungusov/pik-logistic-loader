@@ -13,14 +13,22 @@ IF @@rowcount = 0
     INSERT INTO trackers VALUES (:id, :label, :group_id, 1)
   END
 
+
+-- :name disable-groups! :! :n
+-- :doc disable all groups
+UPDATE groups SET
+  live = 0
+
 -- :name group! :! :n
 UPDATE groups SET
-  title = :title
+  title = :title, live = 1
 WHERE id = :id
 IF @@rowcount = 0
   BEGIN
-    INSERT INTO groups VALUES (:id, :title)
+    INSERT INTO groups VALUES (:id, :title, 1)
   END
+
+
 
 -- :name rule! :! :n
 UPDATE rules SET
@@ -32,15 +40,22 @@ IF @@rowcount = 0
     VALUES (:id, :type, :name, :zone_id)
   END
 
+
+-- :name disable-zones! :! :n
+-- :doc disable all zones
+UPDATE zones SET
+  live = 0
+
 -- :name zone! :! :n
 UPDATE zones SET
-  label = :label, address = :address
+  label = :label, address = :address, live = 1
 WHERE id = :id
 IF @@rowcount = 0
   BEGIN
-    INSERT INTO zones ( id, label, address)
-    VALUES (:id, :label, :address)
+    INSERT INTO zones (id, label, address, live)
+    VALUES (:id, :label, :address, 1)
   END
+
 
 -- :name tracker-state! :! :n
 UPDATE tracker_states SET

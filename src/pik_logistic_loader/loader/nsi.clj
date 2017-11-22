@@ -5,6 +5,7 @@
             [pik-logistic-loader.db.commands :as c]
             [pik-logistic-loader.navixy.data :as api]))
 
+
 (defn trackers []
   (let [values (api/trackers)]
     (with-db-transaction [tx db]
@@ -17,9 +18,11 @@
 (defn groups []
   (let [values (api/groups)]
     (with-db-transaction [tx db]
+      (c/disable-groups! tx)
       (doseq [v values]
         (c/group! tx v)))
     (log/info "nsi groups")))
+
 
 (defn rules []
   (let [values (api/rules)]
@@ -28,9 +31,11 @@
         (c/rule! tx v)))
     (log/info "nsi rules")))
 
+
 (defn zones []
   (let [values (api/zones)]
     (with-db-transaction [tx db]
+      (c/disable-zones! tx)
       (doseq [v values]
         (c/zone! tx v)))
     (log/info "nsi zones")))
